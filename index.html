@@ -1,66 +1,143 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة تخمين الرقم</title>
+    <title>Guess Word Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: pink;
+        }
+
+        .word-display {
+            font-size: 2em;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .input-section {
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: transparent;
+            border: 3px solid pink;
+            color: pink;
+            margin-left: 10px;
+            margin-top: 20px;
+            border-radius: 12px;
+            transition: 0.4s;
+        }
+
+        button:hover {
+            background-color: pink;
+            transition: 0.4s;
+            transform: scale(1.15) translateY(-10px);
+            color: white;
+            box-shadow: 0 0 5px 0 pink;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        footer {
+            margin-bottom: 30px;
+            font-size: 1em;
+            color: pink;
+            font-weight: 900;
+            
+        }
+    </style>
 </head>
 <body>
-    <h1>لعبة تخمين الرقم</h1>
-    <p>اختر رقمًا بين 1 و 10:</p>
+    <h1>Guess Word Game</h1>
+    <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+    <div class="input-section">
+        <input type="text" id="letterInput" maxlength="1" placeholder="add letter"/>
+        <button onclick="guessLetter()">Guess</button>
+    </div>
+    <div class="message" id="message"></div>
 
-    <!-- حقل إدخال للتخمين -->
-    <input type="number" id="guessInput" min="1" max="10">
-
-    <!-- زر المحاولة -->
-    <button onclick="checkGuess()">حاول</button>
-
-    <!-- زر إعادة اللعبة -->
-    <button onclick="resetGame()">إعادة اللعبة</button>
-
-    <!-- مكان لعرض الرسالة -->
-    <p id="message"></p>
-    <p id="attemptsLeft">المحاولات المتبقية: 3</p>
-
-    <!-- إضافة جافا سكريبت -->
     <script>
-        let random = Math.floor(Math.random() * 10 + 1);
-let message = document.getElementById("message");
-let attemptsElement = document.getElementById("attemptsLeft");
-let attempts = 3;
+        const words = ["Trachea", "lungs", "Alveoli", "Bronchioles", "bronchi" , "Throat" , "Nose"];
+        const selectedWord = words[Math.floor(Math.random() * words.length)];
+        let guessedWord = Array(selectedWord.length).fill("_");
+        let remainingGuesses = 20;
 
-function checkGuess() {
-    let guess = parseInt(document.getElementById("guessInput").value);
-    if (attempts > 0) {
-        if (guess == random) {
-            message.innerText = "Your Guess IS True";
-            message.style.color = "green";
-        } else if (guess > random) {
-            message.innerText = "too high";
-            message.style.color = "orange";
-            attempts--;
-            attemptsElement.innerText = `المحاولات المتبقية: ${attempts}`;
-        } else if (guess < random) {
-            message.innerText = "too low";
-            message.style.color = "orange";
-            attempts--;
-            attemptsElement.innerText = `المحاولات المتبقية: ${attempts}`;
+        function updateWordDisplay() {
+            document.getElementById("wordDisplay").textContent = guessedWord.join(" ");
         }
-    }
 
-else if (attempts == 0) {
-    message.innerText = "You have no more attempts!"
-}
-}
-    // 2nd section :)
-    function resetGame() {
-    attempts = 3;
-    random = Math.floor(Math.random() * 10 + 1);
-    message.innerText = "";
-    attemptsElement.innerText = `المحاولات المتبقية: ${attempts}`;
-    document.getElementById("guessInput").value = "";
-}
+        function guessLetter() {
+            const input = document.getElementById("letterInput").value.toLowerCase();
+            document.getElementById("letterInput").value = ""; 
 
+            if (input.length === 1 && /^[a-zA-Z]$/.test(input)) {
+                if (selectedWord.includes(input)) {
+                    for (let i = 0; i < selectedWord.length; i++) {
+                        if (selectedWord[i].toLowerCase() === input) {
+                            guessedWord[i] = selectedWord[i];
+                        }
+                    }
+                    document.getElementById("message").textContent = "Good! Correct letter";
+                    document.getElementById("message").classList.remove("incorrect");
+                    document.getElementById("message").classList.add("correct");
+                } else {
+                    remainingGuesses--;
+                    document.getElementById("message").textContent = "Try Again : " + remainingGuesses;
+                    document.getElementById("message").classList.remove("correct");
+                    document.getElementById("message").classList.add("incorrect");
+                }
+
+                if (!guessedWord.includes("_")) {
+                    document.getElementById("message").textContent = "Bravo correct Word!";
+                    document.getElementById("message").classList.remove("incorrect");
+                    document.getElementById("message").classList.add("correct");
+                } else if (remainingGuesses === 0) {
+                    document.getElementById("message").textContent = "You lost! The word was: " + selectedWord;
+                    document.getElementById("message").classList.remove("correct");
+                    document.getElementById("message").classList.add("incorrect");
+                }
+
+                updateWordDisplay();
+            } else {
+                document.getElementById("message").textContent = "Please add a letter.";
+                document.getElementById("message").classList.add("incorrect");
+            }
+        }
+
+        updateWordDisplay();
     </script>
+
+    <footer>
+        &copy All copy reserved to Miss Habiba
+    </footer>
 </body>
 </html>
